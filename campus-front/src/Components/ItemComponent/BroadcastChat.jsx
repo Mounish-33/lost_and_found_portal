@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getBroadcastMessages, sendBroadcastMessage } from '../../Services/ChatService';
 import './Chat.css';
 
 const BroadcastChat = () => {
@@ -13,7 +12,6 @@ const BroadcastChat = () => {
 
   useEffect(() => {
     loadMessages();
-    const interval = setInterval(loadMessages, 3000); // Refresh every 3 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -66,7 +64,6 @@ const BroadcastChat = () => {
         <p>Public chat for all students</p>
       </div>
       
-      <div className="messages-container">
         {messages.length === 0 ? (
           <div className="no-messages">
             <p>No messages yet. Start the conversation!</p>
@@ -87,7 +84,6 @@ const BroadcastChat = () => {
             </div>
           ))
         )}
-        <div ref={messagesEndRef} />
       </div>
 
       <form onSubmit={handleSendMessage} className="message-form">
