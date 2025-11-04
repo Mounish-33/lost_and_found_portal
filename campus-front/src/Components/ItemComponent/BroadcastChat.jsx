@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getBroadcastMessages, sendBroadcastMessage, getActiveUsers } from '../../Services/ChatService';
 import './Chat.css';
 
 const BroadcastChat = () => {
@@ -7,11 +8,17 @@ const BroadcastChat = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
+  const [activeUsers, setActiveUsers] = useState([]);
   const messagesEndRef = useRef(null);
   const currentUser = localStorage.getItem('username') || sessionStorage.getItem('currentUser');
 
   useEffect(() => {
     loadMessages();
+    loadActiveUsers();
+    const interval = setInterval(() => {
+      loadMessages();
+      loadActiveUsers();
+    }, 3000); // Refresh every 3 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -27,6 +34,15 @@ const BroadcastChat = () => {
       console.error('Error loading messages:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadActiveUsers = async () => {
+    try {
+      const response = await getActiveUsers();
+      setActiveUsers(response.data || []);
+    } catch (error) {
+      console.error('Error loading active users:', error);
     }
   };
 
@@ -64,6 +80,8 @@ const BroadcastChat = () => {
         <p>Public chat for all students</p>
       </div>
       
+      <div className="chat-body">
+        <div className="messages-container">
         {messages.length === 0 ? (
           <div className="no-messages">
             <p>No messages yet. Start the conversation!</p>
@@ -84,6 +102,20 @@ const BroadcastChat = () => {
             </div>
           ))
         )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="active-users-sidebar">
+          <h4>Active Users ({activeUsers.length})</h4>
+          <div className="users-list">
+            {activeUsers.map((user, index) => (
+              <div key={index} className={`user-item ${user === currentUser ? 'current-user' : ''}`}>
+                <span className="user-status">●</span>
+                <span className="user-name">{user}</span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSendMessage} className="message-form">
