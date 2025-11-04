@@ -21,3 +21,7 @@ export const getBroadcastMessages = () => {
 export const sendBroadcastMessage = (message) => {
   return axios.post(`${BASE_URL}/broadcast`, message);
 };
+
+export const getActiveUsers = () => {
+  return axios.get(`${BASE_URL}/active-users`);
+};
